@@ -2,7 +2,9 @@ import pandas as pd
 from datetime import datetime
 from sklearn.neighbors import KNeighborsRegressor
 
-def transform_and_normalize_date(X):
+def transform_and_normalize_data(df):
+    X = df[['Store', 'Dept', 'Date', 'IsHoliday']].as_matrix()
+
     max_week = 0
     for i in range(int(X.size/4)):
         X[i][2] = datetime.strptime(X[i][2], '%Y-%m-%d').isocalendar()[1]
@@ -10,11 +12,12 @@ def transform_and_normalize_date(X):
     for i in range(int(X.size/4)):
         X[i][2] /= max_week
 
+    return X
+
 # Retrieve and pre-process the training set.
 train_df = pd.read_csv('train.csv')
-X = train_df[['Store', 'Dept', 'Date', 'IsHoliday']].as_matrix()
+X = transform_and_normalize_data(train_df)
 y = train_df[['Weekly_Sales']].as_matrix()
-transform_and_normalize_date(X)
 
 # Train the kNN model.
 knn_regressor = KNeighborsRegressor(n_neighbors=50, weights='distance', p=1)
@@ -22,9 +25,8 @@ knn_regressor.fit(X, y)
 
 # Retrieve and pre-process the testing set.
 test_df = pd.read_csv('test.csv')
-T = test_df[['Store', 'Dept', 'Date', 'IsHoliday']].as_matrix()
+T = transform_and_normalize_data(test_df)
 ids = test_df[['Store', 'Dept', 'Date']].as_matrix()
-transform_and_normalize_date(T)
 
 # Write the prediction results to submission.csv file.
 with open('submission.csv', 'w') as file:
