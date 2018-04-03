@@ -3,12 +3,12 @@ from datetime import datetime
 from sklearn.neighbors import KNeighborsRegressor
 
 def transform_and_normalize_date(X):
-    max_day = 0
+    max_week = 0
     for i in range(int(X.size/4)):
-        X[i][2] = datetime.strptime(X[i][2], '%Y-%m-%d').timetuple().tm_yday
-        if max_day < X[i][2]: max_day = X[i][2]
+        X[i][2] = datetime.strptime(X[i][2], '%Y-%m-%d').isocalendar()[1]
+        if max_week < X[i][2]: max_week = X[i][2]
     for i in range(int(X.size/4)):
-        X[i][2] /= max_day
+        X[i][2] /= max_week
 
 # Retrieve and pre-process the training set.
 train_df = pd.read_csv('train.csv')
